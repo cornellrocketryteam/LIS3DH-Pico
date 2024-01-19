@@ -8,7 +8,7 @@ LIS3DH::LIS3DH(i2c_inst_t *i2c_type) {
 bool LIS3DH::begin() {
     uint8_t whoami = get_id();
     if (whoami != LI3DH_WHO_AM_I) {
-        fprintf(stderr, "Error: Got whoami value of %d\n", whoami);
+        fprintf(stderr, "Error: Accelerometer got whoami value of %d\n", whoami);
         return false;
     }
 
@@ -17,19 +17,18 @@ bool LIS3DH::begin() {
     return true;
 }
 
-bool LIS3DH::read_accel(float *x, float *y, float *z) {
+bool LIS3DH::read_accel(double *x, double *y, double *z) {
 
     int16_t x_temp = (int16_t)read_register_16(LIS3DH_REG_OUT_X_L);
     int16_t y_temp = (int16_t)read_register_16(LIS3DH_REG_OUT_Y_L);
     int16_t z_temp = (int16_t)read_register_16(LIS3DH_REG_OUT_Z_L);
 
     // TODO: Consider auto-incrementing
-    *x = (4 * (float)x_temp / 64000) * GRAVITY_EARTH;
-    *y = (4 * (float)y_temp / 64000) * GRAVITY_EARTH;
-    *z = (4 * (float)z_temp / 64000) * GRAVITY_EARTH;
+    *x = (4 * (double)x_temp / 64000) * GRAVITY_EARTH;
+    *y = (4 * (double)y_temp / 64000) * GRAVITY_EARTH;
+    *z = (4 * (double)z_temp / 64000) * GRAVITY_EARTH;
 
     return true;
-    
 }
 
 uint16_t LIS3DH::read_register_16(uint8_t reg) {

@@ -22,7 +22,7 @@ class LIS3DH {
 public:
     LIS3DH(i2c_inst_t *i2c_type);
     bool begin();
-    bool read_accel(float *x, float *y, float *z);
+    bool read_accel(double *x, double *y, double *z);
     
     uint8_t get_id();
 private:

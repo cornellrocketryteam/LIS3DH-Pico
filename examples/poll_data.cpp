@@ -2,8 +2,8 @@
 #include "tusb.h"
 
 #define I2C_PORT i2c0
-#define I2C_SDA 4
-#define I2C_SCL 5
+#define I2C_SDA 12
+#define I2C_SCL 13
 
 LIS3DH accel(I2C_PORT);
 
@@ -28,7 +28,7 @@ int main() {
         printf("Init failed\n");
         return 1;
     }
-    float x, y, z;
+    double x, y, z;
 
     while (true) {
         accel.read_accel(&x, &y, &z);
