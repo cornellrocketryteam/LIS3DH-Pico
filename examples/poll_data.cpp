@@ -28,7 +28,7 @@ int main() {
         printf("Init failed\n");
         return 1;
     }
-    double x, y, z;
+    float x, y, z;
 
     while (true) {
         accel.read_accel(&x, &y, &z);
