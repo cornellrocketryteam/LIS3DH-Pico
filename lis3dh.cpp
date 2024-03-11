@@ -5,7 +5,7 @@ LIS3DH::LIS3DH(i2c_inst_t *i2c_type) {
     i2c = i2c_type;
 }
 
-bool LIS3DH::begin() {
+bool LIS3DH::begin(int g_range) {
     uint8_t whoami = get_id();
     if (whoami != LI3DH_WHO_AM_I) {
 #ifdef VERBOSE
@@ -18,6 +18,35 @@ bool LIS3DH::begin() {
         return false;
     }
 
+    uint8_t config[1];
+    switch (g_range) {
+    case 2:
+        config[0] = 0b00000000;
+        this->lsb = 4;
+        break;
+    case 4:
+        config[0] = 0b00010000;
+        this->lsb = 8;
+        break;
+    case 8:
+        config[0] = 0b00100000;
+        this->lsb = 16;
+        break;
+    case 16:
+        config[0] = 0b00110000;
+        this->lsb = 48;
+        break;
+    default:
+#ifdef VERBOSE
+        fprintf(stderr, "Error: Invalid G range\n");
+#endif
+        return false;
+    }
+
+    if (write_register(LIS3DH_REG_CTRL_4, config[0]) < 1) {
+        return false;
+    }
+
     return true;
 }
 
@@ -25,13 +54,24 @@ bool LIS3DH::read_accel(float *x, float *y, float *z) {
 
     int16_t x_raw, y_raw, z_raw;
     ret = read_raw_accel(LIS3DH_REG_OUT_X_L, &x_raw);
+    if (!ret) {
+        return false;
+    }
+
     ret = read_raw_accel(LIS3DH_REG_OUT_Y_L, &y_raw);
+    if (!ret) {
+        return false;
+    }
+
     ret = read_raw_accel(LIS3DH_REG_OUT_Z_L, &z_raw);
+    if (!ret) {
+        return false;
+    }
 
     // TODO: Consider auto-incrementing
-    *x = (4 * (float)x_raw / 64000) * GRAVITY_EARTH;
-    *y = (4 * (float)y_raw / 64000) * GRAVITY_EARTH;
-    *z = (4 * (float)z_raw / 64000) * GRAVITY_EARTH;
+    *x = (this->lsb * (float)x_raw / 64000);
+    *y = (this->lsb * (float)y_raw / 64000);
+    *z = (this->lsb * (float)z_raw / 64000);
 
     return true;
 }

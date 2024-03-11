@@ -31,12 +31,13 @@ public:
 
     /**
      * Attempts to establish a connection with the sensor and initiates a software reset.
+     * @param g_range The full-scale range of the sensor
      * @return True on successful connection, false otherwise
      */
-    bool begin();
+    bool begin(int g_range = 16);
 
     /**
-     * Reads 3-axis acceleration values in meters per second squared.
+     * Reads 3-axis acceleration values in G's.
      * @param x The resulting x-axis acceleration
      * @param y The resulting y-axis acceleration
      * @param z The resulting z-axis acceleration
@@ -66,6 +67,12 @@ private:
      * @return True on successful read, false otherwise
      */
     bool read_raw_accel(uint8_t reg, int16_t *val);
+
+    /**
+     * The scaling factor for acceleration values.
+     * This is dependent on the full-scale range.
+     */
+    int lsb;
 
     /**
      * Return value for I2C reads and writes.

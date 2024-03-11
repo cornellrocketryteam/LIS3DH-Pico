@@ -22,7 +22,7 @@ int main() {
     }
     printf("Connected\n");
 
-    if (accel.begin()) {
+    if (accel.begin(16)) {
         printf("Init successful\n");
     } else {
         printf("Init failed\n");
