@@ -4,7 +4,7 @@
 #include "hardware/i2c.h"
 #include "pico/stdlib.h"
 
-#define LIS3DH_ADDR (0x19)
+#define LIS3DH_ADDR (0x18)
 
 #define LIS3DH_REG_CTRL_1 (0x20)
 #define LIS3DH_REG_CTRL_4 (0x23)
