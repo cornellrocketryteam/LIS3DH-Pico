@@ -10,7 +10,7 @@ LIS3DH accel(I2C_PORT);
 int main() {
     stdio_init_all();
 
-    i2c_init(I2C_PORT, 100 * 1000);
+    i2c_init(I2C_PORT, 400 * 1000);
     gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
 
@@ -22,20 +22,20 @@ int main() {
     }
     printf("Connected\n");
 
-    if (accel.begin(16)) {
-        printf("Init successful\n");
-    } else {
-        printf("Init failed\n");
-        return 1;
+    while (!accel.begin(16)) {
+        printf("Error: Accelerometer failed to initialize\n");
     }
     float x, y, z;
 
     while (true) {
-        accel.read_accel(&x, &y, &z);
-        printf("x: %.3f m/s^2\n", x);
-        printf("y: %.3f m/s^2\n", y);
-        printf("z: %.3f m/s^2\n\n", z);
-        sleep_ms(200);
+        if (!accel.read_accel(&x, &y, &z)) {
+            printf("Error: Accelerometer failed to read acceleration\n");
+        }
+
+        printf("Accel X (m/s^2): %.3f\n", x);
+        printf("Accel Y (m/s^2): %.3f\n", y);
+        printf("Accel Z (m/s^2): %.3f\n\n", z);
+        sleep_ms(20);
     }
 
     return 0;

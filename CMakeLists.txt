@@ -5,6 +5,6 @@ target_sources(LIS3DH-Pico INTERFACE
 )
 
 target_link_libraries(LIS3DH-Pico INTERFACE
-    hardware_i2c
     pico_stdlib
+    hardware_i2c
 )

@@ -18,32 +18,33 @@ bool LIS3DH::begin(int g_range) {
         return false;
     }
 
-    uint8_t config[1];
+    uint8_t config;
+
     switch (g_range) {
     case 2:
-        config[0] = 0b00000000;
-        this->lsb = 4;
+        config = 0b00000000;
+        lsb = 4;
         break;
     case 4:
-        config[0] = 0b00010000;
-        this->lsb = 8;
+        config = 0b00010000;
+        lsb = 8;
         break;
     case 8:
-        config[0] = 0b00100000;
-        this->lsb = 16;
+        config = 0b00100000;
+        lsb = 16;
         break;
     case 16:
-        config[0] = 0b00110000;
-        this->lsb = 48;
+        config = 0b00110000;
+        lsb = 48;
         break;
     default:
 #ifdef VERBOSE
-        fprintf(stderr, "Error: Invalid G range\n");
+        fprintf(stderr, "Error: Invalid G range for accelerometer\n");
 #endif
         return false;
     }
 
-    if (write_register(LIS3DH_REG_CTRL_4, config[0]) < 1) {
+    if (write_register(LIS3DH_REG_CTRL_4, config) < 1) {
         return false;
     }
 
@@ -51,56 +52,27 @@ bool LIS3DH::begin(int g_range) {
 }
 
 bool LIS3DH::read_accel(float *x, float *y, float *z) {
-
     int16_t x_raw, y_raw, z_raw;
-    ret = read_raw_accel(LIS3DH_REG_OUT_X_L, &x_raw);
-    if (!ret) {
+
+    uint8_t raw[6] = {0};
+
+    // MSB of 1 indicates register auto-increment
+    uint8_t reg = LIS3DH_REG_OUT_X_L | 0x80;
+
+    if (i2c_write_blocking(i2c, LIS3DH_ADDR, &reg, 1, true) < 1) {
+        return false;
+    }
+    if (i2c_read_blocking(i2c, LIS3DH_ADDR, raw, 6, false) < 1) {
         return false;
     }
 
-    ret = read_raw_accel(LIS3DH_REG_OUT_Y_L, &y_raw);
-    if (!ret) {
-        return false;
-    }
+    x_raw = (int16_t)(raw[0] | raw[1] << 8);
+    y_raw = (int16_t)(raw[2] | raw[3] << 8);
+    z_raw = (int16_t)(raw[4] | raw[5] << 8);
 
-    ret = read_raw_accel(LIS3DH_REG_OUT_Z_L, &z_raw);
-    if (!ret) {
-        return false;
-    }
-
-    // TODO: Consider auto-incrementing
-    *x = (this->lsb * (float)x_raw / 64000);
-    *y = (this->lsb * (float)y_raw / 64000);
-    *z = (this->lsb * (float)z_raw / 64000);
-
-    return true;
-}
-
-bool LIS3DH::read_raw_accel(uint8_t reg, int16_t *val) {
-    uint8_t lsb, msb;
-
-    ret = i2c_write_blocking(i2c, LIS3DH_ADDR, &reg, 1, true);
-    if (ret < 1) {
-        return false;
-    }
-
-    ret = i2c_read_blocking(i2c, LIS3DH_ADDR, &lsb, 1, false);
-    if (ret < 1) {
-        return false;
-    }
-
-    reg |= 0x01;
-    ret = i2c_write_blocking(i2c, LIS3DH_ADDR, &reg, 1, true);
-    if (ret < 1) {
-        return false;
-    }
-
-    ret = i2c_read_blocking(i2c, LIS3DH_ADDR, &msb, 1, false);
-    if (ret < 1) {
-        return false;
-    }
-
-    *val = (msb << 8) | lsb;
+    *x = (lsb * (float)x_raw / 64000);
+    *y = (lsb * (float)y_raw / 64000);
+    *z = (lsb * (float)z_raw / 64000);
 
     return true;
 }
@@ -120,8 +92,7 @@ bool LIS3DH::write_register(const uint8_t reg, const uint8_t val) {
     buf[0] = reg;
     buf[1] = val;
 
-    ret = i2c_write_blocking(i2c, LIS3DH_ADDR, buf, 2, false);
-    if (ret < 1) {
+    if (i2c_write_blocking(i2c, LIS3DH_ADDR, buf, 2, false) < 1) {
         return false;
     }
 

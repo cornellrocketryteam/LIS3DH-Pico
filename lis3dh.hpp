@@ -16,8 +16,6 @@
 #define LIS3DH_REG_WHO_AM_I (0x0F)
 #define LI3DH_WHO_AM_I (0x33)
 
-#define GRAVITY_EARTH (9.80665F)
-
 /**
  * Representation of the LIS3DH sensor.
  */
@@ -66,21 +64,16 @@ private:
      * @param val The resulting 16 bit acceleration value
      * @return True on successful read, false otherwise
      */
-    bool read_raw_accel(uint8_t reg, int16_t *val);
+    // bool read_raw_accel(uint8_t reg, int16_t *val);
 
     /**
      * The scaling factor for acceleration values.
      * This is dependent on the full-scale range.
      */
-    int lsb;
+    int lsb = 48;
 
     /**
-     * Return value for I2C reads and writes.
-     */
-    int ret;
-
-    /**
-     * The I2C bus.
+     * The I2C bus
      */
     i2c_inst_t *i2c;
 };
