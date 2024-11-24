@@ -17,7 +17,7 @@
 #define LI3DH_WHO_AM_I (0x33)
 
 /**
- * Representation of the LIS3DH sensor.
+ * Representation of the LIS3DH sensor
  */
 class LIS3DH {
 public:
@@ -57,14 +57,6 @@ private:
      * @return True on successful write, false otherwise
      */
     bool write_register(const uint8_t reg, const uint8_t val);
-
-    /**
-     * Reads a single raw acceleration value.
-     * @param reg The register to read from
-     * @param val The resulting 16 bit acceleration value
-     * @return True on successful read, false otherwise
-     */
-    // bool read_raw_accel(uint8_t reg, int16_t *val);
 
     /**
      * The scaling factor for acceleration values.
