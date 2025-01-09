@@ -16,6 +16,8 @@
 #define LIS3DH_REG_WHO_AM_I (0x0F)
 #define LI3DH_WHO_AM_I (0x33)
 
+#define BYTE_TIMEOUT_US (1000)
+
 /**
  * Representation of the LIS3DH sensor
  */

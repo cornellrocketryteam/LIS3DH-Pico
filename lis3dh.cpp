@@ -59,10 +59,10 @@ bool LIS3DH::read_accel(float *x, float *y, float *z) {
     // MSB of 1 indicates register auto-increment
     uint8_t reg = LIS3DH_REG_OUT_X_L | 0x80;
 
-    if (i2c_write_blocking(i2c, LIS3DH_ADDR, &reg, 1, true) < 1) {
+    if (i2c_write_timeout_us(i2c, LIS3DH_ADDR, &reg, 1, true, BYTE_TIMEOUT_US) < 1) {
         return false;
     }
-    if (i2c_read_blocking(i2c, LIS3DH_ADDR, raw, 6, false) < 1) {
+    if (i2c_read_timeout_us(i2c, LIS3DH_ADDR, raw, 6, false, BYTE_TIMEOUT_US) < 1) {
         return false;
     }
 
@@ -78,13 +78,13 @@ bool LIS3DH::read_accel(float *x, float *y, float *z) {
 }
 
 uint8_t LIS3DH::get_id() {
-    uint8_t val[1];
-    uint8_t reg[1] = {LIS3DH_REG_WHO_AM_I};
+    uint8_t val;
+    uint8_t reg = LIS3DH_REG_WHO_AM_I;
 
-    i2c_write_blocking(i2c, LIS3DH_ADDR, reg, 1, true);
-    i2c_read_blocking(i2c, LIS3DH_ADDR, val, 1, false);
+    i2c_write_timeout_us(i2c, LIS3DH_ADDR, &reg, 1, true, BYTE_TIMEOUT_US);
+    i2c_read_timeout_us(i2c, LIS3DH_ADDR, &val, 1, false, BYTE_TIMEOUT_US);
 
-    return val[0];
+    return val;
 }
 
 bool LIS3DH::write_register(const uint8_t reg, const uint8_t val) {
@@ -92,7 +92,7 @@ bool LIS3DH::write_register(const uint8_t reg, const uint8_t val) {
     buf[0] = reg;
     buf[1] = val;
 
-    if (i2c_write_blocking(i2c, LIS3DH_ADDR, buf, 2, false) < 1) {
+    if (i2c_write_timeout_us(i2c, LIS3DH_ADDR, buf, 2, false, BYTE_TIMEOUT_US) < 1) {
         return false;
     }
 
